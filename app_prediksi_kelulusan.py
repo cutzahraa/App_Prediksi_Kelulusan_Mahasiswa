@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.tree import DecisionTreeClassifier
+from sklearn.tree import DecisionTreeClassifier, plot_tree
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score, confusion_matrix
 
@@ -59,6 +59,38 @@ st.set_page_config(page_title="Prediksi Kelulusan Mahasiswa", layout="centered")
 st.title("🎓 Aplikasi Prediksi Kelulusan Mahasiswa")
 
 st.markdown("Prediksi kelulusan mahasiswa berdasarkan data akademik.")
+st.markdown("""
+### 🧠 Tentang Model Prediksi
+
+Model yang digunakan untuk memprediksi status kelulusan mahasiswa adalah **Decision Tree Classifier**.
+
+Model ini bekerja dengan **membagi data berdasarkan aturan-aturan sederhana** seperti IPK, jumlah SKS, jumlah mata kuliah yang diulang, riwayat cuti, serta indikator lainnya untuk menentukan apakah mahasiswa akan:
+- ✅ **Lulus tepat waktu**
+- ⏱️ **Lulus tidak tepat waktu**
+- ❌ **Tidak lulus**
+
+Model ini dilatih menggunakan data akademik historis mahasiswa, dan mampu membuat keputusan berdasarkan **kombinasi berbagai faktor** yang memengaruhi keberhasilan studi mahasiswa.
+
+Visualisasi pohon keputusan di bawah ini memperlihatkan bagaimana setiap keputusan dibuat oleh model berdasarkan data input. Hasil prediksi juga dilengkapi dengan **probabilitas** untuk membantu memahami seberapa besar tingkat keyakinan model terhadap prediksinya.
+
+---
+
+### 📌 Faktor yang Paling Mempengaruhi Kelulusan Mahasiswa
+
+Berdasarkan hasil pemodelan, beberapa faktor utama yang paling berpengaruh terhadap kelulusan mahasiswa di antaranya:
+
+- **IPK (Indeks Prestasi Kumulatif):** Mewakili performa akademik keseluruhan.
+- **IPS Terakhir:** Indikator tren nilai terbaru, menunjukkan apakah ada peningkatan atau penurunan.
+- **Jumlah SKS:** Jumlah beban studi yang telah ditempuh.
+- **Jumlah Mata Kuliah Mengulang:** Menunjukkan adanya hambatan akademik.
+- **Riwayat Cuti:** Cuti akan memperpanjang masa studi atau menjadi indikasi kendala akademik/pribadi.
+- **Semester Saat Ini:** Jika semester melebihi waktu studi wajar (misalnya 8 semester), kemungkinan kelulusan tepat waktu menurun.
+
+
+Semakin besar pengaruh faktor tersebut pada hasil prediksi model, maka semakin tinggi perannya dalam menentukan kelulusan mahasiswa.
+""")
+
+
 with st.expander("📄 Lihat Dataset"):
     st.dataframe(df)
 
@@ -101,15 +133,8 @@ if tombol:
     st.subheader("📢 Hasil Prediksi")
     st.success(f"Mahasiswa diprediksi: **{hasil}**")
 
-    # Visualisasi Persentase
-    st.subheader("📊 Persentase Prediksi")
-    persen_df = pd.DataFrame({
-        "Status": ["❌ Tidak Lulus", "⏱️ Lulus Tidak Tepat Waktu", "✅ Lulus"],
-        "Probabilitas": [round(p * 100, 2) for p in proba]
-    })
-
-    fig, ax = plt.subplots()
-    sns.barplot(x="Status", y="Probabilitas", data=persen_df, palette="Set2", ax=ax)
-    ax.set_ylabel("Persentase (%)")
-    ax.set_ylim(0, 100)
-    st.pyplot(fig)
+    # Visualisasi Decision Tree
+    st.subheader("🌳 Visualisasi Decision Tree")
+    fig_tree, ax_tree = plt.subplots(figsize=(12, 6))
+    plot_tree(clf, feature_names=X.columns, class_names=["Tidak Lulus", "Lulus Tidak Tepat Waktu", "Lulus"], filled=True)
+    st.pyplot(fig_tree)
