@@ -133,6 +133,19 @@ if tombol:
     st.subheader("📢 Hasil Prediksi")
     st.success(f"Mahasiswa diprediksi: **{hasil}**")
 
+       # Visualisasi Persentase
+    st.subheader("📊 Persentase Prediksi")
+    persen_df = pd.DataFrame({
+        "Status": ["❌ Tidak Lulus", "⏱️ Lulus Tidak Tepat Waktu", "✅ Lulus"],
+        "Probabilitas": [round(p * 100, 2) for p in proba]
+    })
+
+    fig, ax = plt.subplots()
+    sns.barplot(x="Status", y="Probabilitas", data=persen_df, palette="Set2", ax=ax)
+    ax.set_ylabel("Persentase (%)")
+    ax.set_ylim(0, 100)
+    st.pyplot(fig)
+
     # Visualisasi Decision Tree
     st.subheader("🌳 Visualisasi Decision Tree")
     fig_tree, ax_tree = plt.subplots(figsize=(12, 6))
